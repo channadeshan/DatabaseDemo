@@ -11,7 +11,7 @@ namespace WebStore
         {
 
 
-            using var context = new WebStoreContext();
+            using var context = new WebStore1Context();
 
 
             var Assigments = new LinqQueriesAssignment(context);

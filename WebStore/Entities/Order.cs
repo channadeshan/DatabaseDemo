@@ -17,9 +17,6 @@ public partial class Order
 
     public int BillingAddressId { get; set; }
 
-
-
-
     public virtual Address BillingAddress { get; set; } = null!;
 
     public virtual Customer Customer { get; set; } = null!;
@@ -27,4 +24,14 @@ public partial class Order
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual Address ShippingAddress { get; set; } = null!;
+
+    public int? CarrierId { get; set; } = null!;
+    public string? TrackingNumber { get; set; } = null!;
+    public DateTime? ShippedDate { get; set; } = null!;
+    public DateTime? DeliveredDate { get; set; } = null!;
+
+    /// <summary>
+    /// Navigation to the carrier (e.g. "UPS", "FedEx")
+    /// </summary>
+    public Carrier? Carrier { get; set; } = null!;
 }

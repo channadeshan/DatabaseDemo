@@ -4,13 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebStore.Entities;
 
-public partial class WebStoreContext : DbContext
+// completeion of Assignment 4
+
+public partial class WebStore1Context : DbContext
 {
-    public WebStoreContext()
+    public WebStore1Context()
     {
     }
 
-    public WebStoreContext(DbContextOptions<WebStoreContext> options)
+    public WebStore1Context(DbContextOptions<WebStore1Context> options)
         : base(options)
     {
     }
@@ -33,8 +35,11 @@ public partial class WebStoreContext : DbContext
 
     public virtual DbSet<Store> Stores { get; set; }
 
+    public DbSet<Carrier> Carriers => Set<Carrier>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=WebStore;Username=postgres;Password=password");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=WebStore1;Username=postgres\n;Password=1234");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,6 +48,8 @@ public partial class WebStoreContext : DbContext
             entity.HasKey(e => e.AddressId).HasName("addresses_pkey");
 
             entity.ToTable("addresses");
+
+            entity.HasIndex(e => e.CustomerId, "IX_addresses_customer_id");
 
             entity.Property(e => e.AddressId).HasColumnName("address_id");
             entity.Property(e => e.AddressType)
@@ -76,6 +83,8 @@ public partial class WebStoreContext : DbContext
 
             entity.ToTable("categories");
 
+            entity.HasIndex(e => e.ParentCategoryId, "IX_categories_parent_category_id");
+
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.CategoryName)
                 .HasMaxLength(100)
@@ -100,6 +109,7 @@ public partial class WebStoreContext : DbContext
                     {
                         j.HasKey("CategoryId", "ProductId").HasName("pk_product_categories");
                         j.ToTable("product_categories");
+                        j.HasIndex(new[] { "ProductId" }, "IX_product_categories_product_id");
                         j.IndexerProperty<int>("CategoryId").HasColumnName("category_id");
                         j.IndexerProperty<int>("ProductId").HasColumnName("product_id");
                     });
@@ -138,6 +148,12 @@ public partial class WebStoreContext : DbContext
 
             entity.ToTable("orders");
 
+            entity.HasIndex(e => e.BillingAddressId, "IX_orders_billing_address_id");
+
+            entity.HasIndex(e => e.CustomerId, "IX_orders_customer_id");
+
+            entity.HasIndex(e => e.ShippingAddressId, "IX_orders_shipping_address_id");
+
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.BillingAddressId).HasColumnName("billing_address_id");
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
@@ -148,6 +164,17 @@ public partial class WebStoreContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("order_status");
             entity.Property(e => e.ShippingAddressId).HasColumnName("shipping_address_id");
+
+            // For the order tracking fields:
+            entity.Property(o => o.TrackingNumber)
+                  .HasColumnName("tracking_number")
+                  .HasMaxLength(50);
+
+            entity.Property(o => o.ShippedDate)
+                  .HasColumnName("shipped_date");
+
+            entity.Property(o => o.DeliveredDate)
+                  .HasColumnName("delivered_date");
 
             entity.HasOne(d => d.BillingAddress).WithMany(p => p.OrderBillingAddresses)
                 .HasForeignKey(d => d.BillingAddressId)
@@ -170,6 +197,8 @@ public partial class WebStoreContext : DbContext
             entity.HasKey(e => new { e.OrderId, e.ProductId }).HasName("pk_order_items");
 
             entity.ToTable("order_items");
+
+            entity.HasIndex(e => e.ProductId, "IX_order_items_product_id");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
@@ -220,6 +249,8 @@ public partial class WebStoreContext : DbContext
 
             entity.ToTable("staff");
 
+            entity.HasIndex(e => e.StoreId, "IX_staff_store_id");
+
             entity.Property(e => e.StaffId).HasColumnName("staff_id");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
@@ -245,6 +276,8 @@ public partial class WebStoreContext : DbContext
             entity.HasKey(e => new { e.StoreId, e.ProductId }).HasName("pk_stocks");
 
             entity.ToTable("stocks");
+
+            entity.HasIndex(e => e.ProductId, "IX_stocks_product_id");
 
             entity.Property(e => e.StoreId).HasColumnName("store_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
@@ -292,6 +325,29 @@ public partial class WebStoreContext : DbContext
             entity.Property(e => e.Street)
                 .HasMaxLength(100)
                 .HasColumnName("street");
+        });
+
+        modelBuilder.Entity<Carrier>(entity =>
+        {
+            entity.HasKey(e => e.CarrierId).HasName("carriers_pkey");
+
+            entity.ToTable("carriers");
+            entity.Property(e => e.CarrierName)
+                .HasMaxLength(50)
+                .HasColumnName("carrier_name");
+
+            entity.Property(e => e.ContactUrl)
+                .HasMaxLength(50)
+                .HasColumnName("contact_url");
+
+            entity.Property(e => e.ContactPhone)
+                .HasMaxLength(50)
+                .HasColumnName("contact_phone");
+
+            entity.HasMany(c => c.Orders)
+                .WithOne(o => o.Carrier)
+                .HasForeignKey(o => o.CarrierId)
+                .OnDelete(DeleteBehavior.SetNull); // If carrier is deleted -> order reference is set to null
         });
 
         OnModelCreatingPartial(modelBuilder);

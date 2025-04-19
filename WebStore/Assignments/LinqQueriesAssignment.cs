@@ -22,9 +22,9 @@ namespace WebStore.Assignments
     public class LinqQueriesAssignment
     {
 
-        private readonly WebStoreContext _dbContext;
+        private readonly WebStore1Context _dbContext;
 
-        public LinqQueriesAssignment(WebStoreContext context)
+        public LinqQueriesAssignment(WebStore1Context context)
         {
             _dbContext = context;
         }
