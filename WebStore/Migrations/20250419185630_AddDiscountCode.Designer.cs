@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebStore.Entities;
@@ -11,9 +12,11 @@ using WebStore.Entities;
 namespace WebStore.Migrations
 {
     [DbContext(typeof(WebStore1Context))]
-    partial class WebStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250419185630_AddDiscountCode")]
+    partial class AddDiscountCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -206,32 +209,25 @@ namespace WebStore.Migrations
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("code");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<int>("DiscountType")
-                        .HasColumnType("discount_type")
-                        .HasColumnName("discount_type");
+                        .HasColumnType("discount_type");
 
                     b.Property<decimal>("DiscountValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("discount_value");
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expiration_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("MaxUsage")
-                        .HasColumnType("integer")
-                        .HasColumnName("max_usage");
+                        .HasColumnType("integer");
 
                     b.Property<int>("TimesUsed")
-                        .HasColumnType("integer")
-                        .HasColumnName("times_used");
+                        .HasColumnType("integer");
 
                     b.HasKey("DiscountCodeId");
 

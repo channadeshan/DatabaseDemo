@@ -30,6 +30,9 @@ public partial class Order
     public DateTime? ShippedDate { get; set; } = null!;
     public DateTime? DeliveredDate { get; set; } = null!;
 
+    public int? DiscountCodeId { get; set; }
+    public DiscountCode? DiscountCode { get; set; }
+
     /// <summary>
     /// Navigation to the carrier (e.g. "UPS", "FedEx")
     /// </summary>

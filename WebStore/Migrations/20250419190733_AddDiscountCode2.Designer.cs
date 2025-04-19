@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebStore.Entities;
@@ -11,9 +12,11 @@ using WebStore.Entities;
 namespace WebStore.Migrations
 {
     [DbContext(typeof(WebStore1Context))]
-    partial class WebStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250419190733_AddDiscountCode2")]
+    partial class AddDiscountCode2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

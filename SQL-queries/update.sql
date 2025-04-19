@@ -14,3 +14,10 @@ UPDATE orders
 SET delivered_date = NOW(),
     order_status   = 'Delivered'
 WHERE order_id = 1;
+
+
+-- Update an Order to Use the Discount
+
+UPDATE orders
+SET discount_code_id = 1  -- referencing discount_codes.discount_code_id
+WHERE order_id = 42;

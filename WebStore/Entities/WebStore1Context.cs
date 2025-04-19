@@ -43,6 +43,51 @@ public partial class WebStore1Context : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        // 1) Register the DiscountType enum as a native Postgres enum
+        //    This method is provided by the Npgsql.EntityFrameworkCore.PostgreSQL extension.
+        //    By default, it will create an enum type in your DB with labels "Percentage" and "Flat".
+        modelBuilder.HasPostgresEnum<DiscountType>(
+            schema: "public",       // or whatever schema you want
+            name: "discount_type"   // the name to use in PostgreSQL
+        );
+
+        // 2) Configure the DiscountCode entity to use the new enum type
+        modelBuilder.Entity<DiscountCode>(entity =>
+        {
+            entity.ToTable("discount_codes");
+
+            entity.HasKey(dc => dc.DiscountCodeId);
+
+            entity.Property(dc => dc.Description).HasColumnName("description");
+            entity.Property(dc => dc.DiscountValue).HasColumnName("discount_value");
+            entity.Property(dc => dc.ExpirationDate).HasColumnName("expiration_date");
+            entity.Property(dc => dc.MaxUsage).HasColumnName("max_usage");
+            entity.Property(dc => dc.TimesUsed).HasColumnName("times_used");
+
+            // By default, EF will map .NET enum to the new Postgres enum type
+            // if we specify the column type as "discount_type"
+            entity.Property(dc => dc.DiscountType)
+                  .HasColumnType("discount_type").HasColumnName("discount_type");  // must match the name above
+
+            // Other columns
+            entity.Property(dc => dc.Code)
+            .HasColumnName("code")
+                  .HasMaxLength(50)
+                  .IsRequired();
+        });
+
+        // 3) Relationship to Order
+        // Update the existing order configuration by adding the DiscountCode relation
+        modelBuilder.Entity<Order>(entity =>
+        {
+
+            entity.HasOne(o => o.DiscountCode)
+                  .WithMany(dc => dc.Orders)
+                  .HasForeignKey(o => o.DiscountCodeId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
         modelBuilder.Entity<Address>(entity =>
         {
             entity.HasKey(e => e.AddressId).HasName("addresses_pkey");
